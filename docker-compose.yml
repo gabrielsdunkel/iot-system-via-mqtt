@@ -1,0 +1,42 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Broker MQTT - Eclipse Mosquitto
+  # ---------------------------------------------------------------------------
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: iot_mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"   # MQTT
+      - "9001:9001"   # MQTT over WebSocket
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - iot_network
+
+  # ---------------------------------------------------------------------------
+  # Publisher - simula sensores e publica no broker
+  # ---------------------------------------------------------------------------
+  publisher:
+    build:
+      context: .
+      dockerfile: publisher/Dockerfile
+    container_name: iot_publisher
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+    networks:
+      - iot_network
+
+# Os próximos serviços (subscriber, dashboard) serão adicionados aqui
+# nos próximos passos do projeto.
+
+networks:
+  iot_network:
+    driver: bridge
+    name: iot_network
