@@ -33,8 +33,45 @@ services:
     networks:
       - iot_network
 
-# Os próximos serviços (subscriber, dashboard) serão adicionados aqui
-# nos próximos passos do projeto.
+  # ---------------------------------------------------------------------------
+  # Subscriber - recebe do broker e grava no SQLite
+  # ---------------------------------------------------------------------------
+  subscriber:
+    build:
+      context: .
+      dockerfile: subscriber/Dockerfile
+    container_name: iot_subscriber
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      - MQTT_HOST=mosquitto
+      - MQTT_PORT=1883
+      - DB_PATH=/data/tanque.db
+    volumes:
+      - ./database:/data
+    networks:
+      - iot_network
+
+  # ---------------------------------------------------------------------------
+  # Dashboard - lê o SQLite e serve a interface Dash em http://localhost:8050
+  # ---------------------------------------------------------------------------
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    container_name: iot_dashboard
+    restart: unless-stopped
+    depends_on:
+      - subscriber
+    environment:
+      - DB_PATH=/data/tanque.db
+    volumes:
+      - ./database:/data:ro
+    ports:
+      - "8050:8050"
+    networks:
+      - iot_network
 
 networks:
   iot_network:

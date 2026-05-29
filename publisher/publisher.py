@@ -35,9 +35,7 @@ from config import (
 )
 from simulador import SimuladorSensor
 
-# -----------------------------------------------------------------------------
 # Logging
-# -----------------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -45,9 +43,7 @@ logging.basicConfig(
 log = logging.getLogger("publisher")
 
 
-# -----------------------------------------------------------------------------
 # Callbacks MQTT
-# -----------------------------------------------------------------------------
 def on_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
         log.info(f"Conectado ao broker MQTT em {MQTT_HOST}:{MQTT_PORT}")
@@ -59,9 +55,7 @@ def on_disconnect(client, userdata, flags, reason_code, properties=None):
     log.warning(f"Desconectado do broker (código: {reason_code})")
 
 
-# -----------------------------------------------------------------------------
 # Inicialização dos simuladores
-# -----------------------------------------------------------------------------
 def criar_simuladores() -> dict[str, SimuladorSensor]:
     """Cria um simulador para cada sensor definido em config.SENSORES."""
     simuladores = {}
@@ -75,9 +69,7 @@ def criar_simuladores() -> dict[str, SimuladorSensor]:
     return simuladores
 
 
-# -----------------------------------------------------------------------------
-# Loop principal
-# -----------------------------------------------------------------------------
+# Main
 def main():
     simuladores = criar_simuladores()
 
